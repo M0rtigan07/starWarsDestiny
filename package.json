@@ -1,0 +1,19 @@
+{
+  "name": "star-wars-destiny-app",
+  "version": "1.0.0",
+  "description": "Juego interactivo Star Wars Destiny",
+  "main": "api/server.js",
+  "scripts": {
+    "start": "node api/server.js",
+    "dev": "nodemon api/server.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.6.1",
+    "express": "^4.22.3",
+    "groq-sdk": "^0.3.3"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}

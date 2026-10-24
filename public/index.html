@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Star Wars: Destiny - Duelo Estelar</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>STAR WARS: DESTINY</h1>
+
+        <!-- PASO 1: SELECCIÓN DE BANDO -->
+        <div id="faction-screen" class="active-screen">
+            <h2 style="text-align:center;">Elige tu Destino</h2>
+            <div class="factions">
+                <div class="faction-card" id="btnRebel">
+                    <h2>⭐ Rebeldes</h2>
+                    <p>Lucha por la libertad galáctica.</p>
+                </div>
+                <div class="faction-card" id="btnImperial">
+                    <h2>🔴 Imperio</h2>
+                    <p>Impón el orden galáctico.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- PASO 2: CONSTRUCCIÓN DE MAZO -->
+        <div id="deck-screen">
+            <h2>Construye tu Mazo de Combate</h2>
+            <p>Elige 5 cartas para llevar al combate estelar:</p>
+            <div class="deck-container">
+                <div class="pool-section">
+                    <h3>Cartas Disponibles</h3>
+                    <div class="card-grid" id="poolGrid"></div>
+                </div>
+                <div class="selected-deck-section">
+                    <h3>Tu Mazo (<span id="deckCount">0</span>/5)</h3>
+                    <div class="card-grid" id="deckGrid"></div>
+                    <button id="btnStartBattle" style="margin-top: 20px; width: 100%;">¡Iniciar Batalla!</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PASO 3: CAMPO DE BATALLA -->
+        <div id="battle-screen">
+            <h3 id="factionTitle" style="text-align: center; color: #3498db; margin: 0 0 15px 0;"></h3>
+            
+            <div class="battlefield">
+                <div class="combatant">
+                    <h3 id="playerName" style="margin: 0;">Tú</h3>
+                    <p style="margin: 5px 0;">HP: <span id="playerHp">20</span> / 20</p>
+                    <div class="hp-bar"><div class="hp-fill" id="playerHpBar" style="width: 100%;"></div></div>
+                    <div class="resource-counter">💎 Recursos: <span id="playerResources">2</span></div>
+                </div>
+                <h2>VS</h2>
+                <div class="combatant">
+                    <h3 style="margin: 0;">IA Oponente (Groq)</h3>
+                    <p style="margin: 5px 0;">HP: <span id="aiHp">20</span> / 20</p>
+                    <div class="hp-bar"><div class="hp-fill" id="aiHpBar" style="width: 100%; background: #e74c3c;"></div></div>
+                    <div class="resource-counter">💎 Recursos: <span id="aiResources">2</span></div>
+                </div>
+            </div>
+
+            <!-- DADOS Y LOG DE NARRACIÓN -->
+            <div class="dice-box">
+                <span id="diceResult" style="font-size: 13px; color: #aaa;">Lanza tus dados para obtener ventaja táctica en tu turno.</span>
+                <br>
+                <button id="btnRollDice" style="margin-top: 8px; padding: 6px 15px; font-size: 12px;">🎲 Lanzar Dados Tácticos</button>
+            </div>
+
+            <div class="combat-log" id="combatLog">
+                [Sistema]: ¡Pasa el ratón sobre tus cartas para verlas en grande y haz clic para jugarlas!<br>
+            </div>
+
+            <!-- MAZO ACTIVO EN MANO -->
+            <div class="active-deck-area">
+                <h4>Tu Mazo en Mano (Zoom al pasar el ratón):</h4>
+                <div class="battle-deck-grid" id="battleDeckGrid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Módulos JS -->
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
