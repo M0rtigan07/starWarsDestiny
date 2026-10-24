@@ -1,17 +1,20 @@
-import { fetchCards, sendTurn } from './api.js';
+import { initMatch, sendTurn } from './api.js';
 import { showScreen, renderPool, renderDeck, renderBattleDeck, updateGameState, appendLog } from './ui.js';
 
 // Estado global del cliente
 const state = {
     chosenFaction: '',
-    allCards: [],
+    aiFaction: '',
     playerDeck: [],
+    aiDeck: [],
     playerHp: 20,
     aiHp: 20,
     playerResources: 2,
     aiResources: 2,
     currentDiceResult: ''
 };
+
+const DECK_SIZE = 15;
 
 // Eventos de Selección de Bando
 document.getElementById('btnRebel').onclick = () => selectFaction('Alianza Rebelde');
@@ -20,18 +23,29 @@ document.getElementById('btnImperial').onclick = () => selectFaction('Imperio Ga
 async function selectFaction(faction) {
     state.chosenFaction = faction;
     showScreen('deck-screen');
+    
+    // Actualizar texto visual para 15 cartas
+    document.querySelector('#deck-screen p').innerText = `Elige ${DECK_SIZE} cartas para llevar al combate estelar:`;
+
     try {
-        state.allCards = await fetchCards(faction);
-        renderPool(state.allCards, addToDeck);
+        // Inicializar partida completa en el backend (crea mazos de 15 para ambos)
+        const matchData = await initMatch(faction);
+        state.aiFaction = matchData.aiFaction;
+        state.aiDeck = matchData.aiDeck;
+
+        // Mostrar el pool de cartas disponibles del jugador (su mazo generado por el servidor)
+        renderPool(matchData.playerDeck, addToDeck);
     } catch (err) {
         console.error(err);
-        alert("Error al cargar las cartas para esta facción.");
+        alert("Error al inicializar los mazos de la batalla.");
     }
 }
 
-function addToDeck(card) {
-    if (state.playerDeck.length >= 5) {
-        alert("¡Tu mazo ya tiene 5 cartas!");
+let availablePoolTemp = []; // Guardamos temporalmente las disponibles si hace falta
+
+function addToDeck(card, cardElement) {
+    if (state.playerDeck.length >= DECK_SIZE) {
+        alert(`¡Tu mazo ya ha alcanzado el límite de ${DECK_SIZE} cartas!`);
         return;
     }
     state.playerDeck.push(card);
@@ -45,12 +59,12 @@ function removeFromDeck(index) {
 
 // Iniciar Batalla
 document.getElementById('btnStartBattle').onclick = () => {
-    if (state.playerDeck.length === 0) {
-        alert("Selecciona al menos una carta para tu mazo.");
+    if (state.playerDeck.length < DECK_SIZE) {
+        alert(`Debes seleccionar exactamente ${DECK_SIZE} cartas para iniciar la batalla (Llevas ${state.playerDeck.length}).`);
         return;
     }
     showScreen('battle-screen');
-    document.getElementById('factionTitle').innerText = `Bando: ${state.chosenFaction}`;
+    document.getElementById('factionTitle').innerText = `Tú: ${state.chosenFaction} vs IA: ${state.aiFaction}`;
     document.getElementById('playerName').innerText = 
         state.chosenFaction === 'Alianza Rebelde' ? 'Héroe Rebelde' : 'Comandante Imperial';
 
@@ -91,9 +105,10 @@ async function executeTurn(actionText) {
             playerHp: state.playerHp,
             aiHp: state.aiHp,
             faction: state.chosenFaction,
+            aiFaction: state.aiFaction,
             playerResources: state.playerResources,
             aiResources: state.aiResources,
-            playerDeck: state.playerDeck
+            aiDeck: state.aiDeck
         });
 
         state.aiHp = Math.max(0, state.aiHp - (response.damageDealt || 1));
@@ -101,12 +116,15 @@ async function executeTurn(actionText) {
         state.playerResources += (response.resourceChange || 0);
 
         updateGameState(state);
-        appendLog(response.message, true);
+        
+        const aiMsg = `[Carta usada: ${response.aiCardPlayed}] - ${response.message}`;
+        appendLog(aiMsg, true);
 
         if (state.aiHp <= 0) alert("¡Victoria estelar! Has derrotado a las fuerzas enemigas.");
         if (state.playerHp <= 0) alert("¡Derrota! Tu escuadrón ha sido destruido.");
 
     } catch (err) {
+        console.error(err);
         appendLog("[Error de comunicación táctica]", true);
     }
 }
