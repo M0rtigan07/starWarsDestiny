@@ -2,10 +2,9 @@
   "name": "star-wars-destiny-app",
   "version": "1.0.0",
   "description": "Juego interactivo Star Wars Destiny",
-  "main": "api/server.js",
+  "main": "api/index.js",
   "scripts": {
-    "start": "node api/server.js",
-    "dev": "nodemon api/server.js"
+    "start": "node api/index.js"
   },
   "dependencies": {
     "dotenv": "^16.6.1",
