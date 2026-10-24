@@ -7,7 +7,7 @@ const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 module.exports = async (req, res) => {
     const { action } = req.query;
 
-    // 1. Endpoint para inicializar la partida (mazos de 15 cartas y facciones cruzadas)
+    // 1. Endpoint para inicializar la partida y enviar las cartas filtradas por facción
     if (req.method === 'GET' && action === 'init-match') {
         try {
             const { playerFaction } = req.query;
@@ -28,19 +28,36 @@ module.exports = async (req, res) => {
             // Determinar facción de la IA (la contraria)
             const aiFaction = playerFaction === 'Alianza Rebelde' ? 'Imperio Galáctico' : 'Alianza Rebelde';
 
-            // Construir mazo del jugador (15 cartas: principales de su bando + neutrales)
+            // REGLA OFICIAL: Filtrar estrictamente por afiliación (Hero/Villain + Neutrales)
+            // Nunca se pueden mezclar cartas de héroes y villanos en el mismo mazo.
             const playerPool = playerFaction === 'Alianza Rebelde' ? heroes : villanos;
-            const playerDeck = [...playerPool, ...neutrales].sort(() => 0.5 - Math.random()).slice(0, 15);
+            const validPlayerCards = [...playerPool, ...neutrales].filter(card => {
+                const aff = (card.affiliation || '').toLowerCase();
+                if (playerFaction === 'Alianza Rebelde') {
+                    return aff === 'hero' || aff === 'neutral' || aff === 'héroe';
+                } else {
+                    return aff === 'villain' || aff === 'neutral' || aff === 'villano';
+                }
+            });
 
-            // Construir mazo de la IA (15 cartas: principales del bando contrario + neutrales)
             const aiPool = aiFaction === 'Alianza Rebelde' ? heroes : villanos;
-            const aiDeck = [...aiPool, ...neutrales].sort(() => 0.5 - Math.random()).slice(0, 15);
+            const validAiCards = [...aiPool, ...neutrales].filter(card => {
+                const aff = (card.affiliation || '').toLowerCase();
+                if (aiFaction === 'Alianza Rebelde') {
+                    return aff === 'hero' || aff === 'neutral' || aff === 'héroe';
+                } else {
+                    return aff === 'villain' || aff === 'neutral' || aff === 'villano';
+                }
+            });
+
+            // Generar mazo automático de la IA (15 cartas aleatorias de su bando válido)
+            const aiDeck = [...validAiCards].sort(() => 0.5 - Math.random()).slice(0, 15);
 
             res.setHeader('Content-Type', 'application/json');
             return res.status(200).json({
                 playerFaction,
                 aiFaction,
-                playerDeck,
+                availableCards: validPlayerCards, // Enviamos el catálogo limpio para que el jugador elija
                 aiDeck,
                 playerHp: 20,
                 aiHp: 20,
@@ -59,7 +76,6 @@ module.exports = async (req, res) => {
         const { playerAction, playerHp, aiHp, faction, aiFaction, playerResources, aiResources, aiDeck } = req.body;
 
         try {
-            // Seleccionar aleatoriamente una carta del mazo de la IA para este turno
             const randomAiCard = aiDeck && aiDeck.length > 0
                 ? aiDeck[Math.floor(Math.random() * aiDeck.length)]
                 : { name: "Tropas de Asalto", description: "Maniobra táctica estándar" };
