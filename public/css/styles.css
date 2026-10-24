@@ -246,3 +246,85 @@ button:hover {
     font-weight: bold;
     color: #fff;
 }
+
+/* Layout Principal de Selección */
+.deck-builder-container {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(250, 204, 21, 0.3);
+    border-radius: 12px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+}
+
+/* Grid de Cartas Disponibles */
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 15px;
+    max-height: 520px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+/* Estilo Individual de Carta */
+.card-item {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 2px solid transparent;
+}
+
+.card-item:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 8px 20px rgba(250, 204, 21, 0.4);
+    border-color: #facc15;
+    z-index: 10;
+}
+
+.card-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 6px;
+}
+
+/* Panel Derecho: Tu Mazo */
+.selected-deck-panel {
+    background: rgba(30, 41, 59, 0.7);
+    border-radius: 8px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.deck-list {
+    max-height: 380px;
+    overflow-y: auto;
+    margin-bottom: 15px;
+}
+
+.deck-card-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(15, 23, 42, 0.6);
+    padding: 8px 12px;
+    margin-bottom: 6px;
+    border-radius: 4px;
+    border-left: 3px solid #facc15;
+    font-size: 0.9rem;
+    color: #e2e8f0;
+}
+
+.deck-card-row:hover {
+    background: rgba(239, 68, 68, 0.2);
+    cursor: pointer;
+}
