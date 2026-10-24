@@ -1,11 +1,9 @@
-// Para pedir las cartas según el bando
-export async function fetchCards(faction) {
-    const res = await fetch(`/api?action=cards&faction=${encodeURIComponent(faction)}`);
-    if (!res.ok) throw new Error("Error al consultar las cartas.");
+export async function initMatch(playerFaction) {
+    const res = await fetch(`/api?action=init-match&playerFaction=${encodeURIComponent(playerFaction)}`);
+    if (!res.ok) throw new Error("Error al inicializar la batalla.");
     return await res.json();
 }
 
-// Para enviar la jugada a la IA
 export async function sendTurn(payload) {
     const res = await fetch('/api', {
         method: 'POST',
